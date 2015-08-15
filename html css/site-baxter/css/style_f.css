@@ -1,0 +1,23 @@
+body {
+background-color:#d2d2d2;
+}
+
+
+#wrapper {
+width:650px;
+outline:1px solid #FF5563;
+padding:0px ;
+margin:60px auto;
+}
+
+#header {
+height:75px;
+background-image:url(../images/redHeader.png)
+}
+
+#sidebar {
+
+background-color:#ebebeb;
+margin-bottom:2px;
+padding:10px;
+}

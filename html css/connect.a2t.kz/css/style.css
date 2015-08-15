@@ -1,0 +1,83 @@
+@charset "utf-8";
+/*
+ The layout is based 960 grid pixel system. The layout is divided 12 columns. Each column width comes from 12 columns width.
+*/
+
+.column-1 		{width:940px; float:left; margin:0 10px 20px 10px;}
+.column-2 		{width:620px; float:left; margin:0 10px 20px 10px;}
+.column-3 		{width:460px; float:left; margin:0 10px 20px 10px;}
+.column-4 		{width:300px; float:left; margin:0 10px 20px 10px;}
+.column-5 		{width:220px; float:left; margin:0 10px 28px 10px;}
+.column-two		{width:302px; float:left; margin:0 10px 32px 8px;}
+.column-three	{width:467px; float:left; margin:0 10px 30px 3px;}
+.column-6 		{width:140px; float:left; margin:0 10px 20px 10px;}
+.cover			{width:100%;  float:left; margin:0 0 15px 0;}
+
+
+
+
+/*:::::: PORTFOLIO ::::::*/
+#portfolio{
+	width:100%;
+}
+.portfolio-list{
+	margin:0;
+	padding:0;
+	width:960px;
+	list-style-type:none;
+	float:left;
+	display:block;
+}
+
+.portfolio-list h3 a{
+	text-decoration:none;
+	color:#000;
+}
+.portfolio-4 img{
+	width:100%;
+}
+.portfolio-4 h3{
+}
+
+.viewport{
+	position:relative;
+	width:100%;
+	overflow:hidden;
+	height:138px;
+}
+.viewport_two{
+	position:relative;
+	width:100%;
+	height:257px;
+	width:302px;
+	overflow:hidden;
+}
+.viewport_three{
+	position:relative;
+	width:100%;
+	height:271px;
+	width:467px;
+	overflow:hidden;
+}
+.viewport span {
+	display: none;
+	font-size: 1.0em;
+	font-weight: bold;
+	height: 100%;
+	position: absolute;
+	text-align: center;
+	text-decoration: none;
+	width: 100%;
+	z-index: 100;
+}
+/*#portfolio-filter li a.current{
+	color:#111;
+	background:#e5e5e5;
+}*/
+
+/*:::::: Isotope filtering :::::::*/
+.isotope-item {	z-index: 2; }
+.isotope-hidden.isotope-item {	pointer-events: none;	z-index: 1;}
+.isotope, .isotope .isotope-item {	-webkit-transition-duration: 0.7s;	-moz-transition-duration: 0.7s;	transition-duration: 0.7s;}
+.isotope {-webkit-transition-property: height, width;	-moz-transition-property: height, width;	transition-property: height, width;}
+.isotope .isotope-item {	-webkit-transition-property: -webkit-transform, opacity;	-moz-transition-property:-moz-transform, opacity;transition-property:transform, opacity;}
