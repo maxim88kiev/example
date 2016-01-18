@@ -1,0 +1,28 @@
+body { background-color: #171717; overflow: hidden; }
+
+.box { 
+	position: absolute; 
+	width: 80px;
+	height: 22px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.box.yellow { background-color: #fed98b; }
+.box.orange {	background-color: #e39559; }
+.box.green  { background-color: #86bda8; }
+.box.player { background-color: #efefef; }
+
+.ball {	
+  position: absolute; 
+	width: 12px;
+	height: 10px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+
+	background-color: #fc4;
+}

@@ -1,0 +1,340 @@
+package drhr4sdh5r4h;
+
+
+import java.util.*;
+import java.awt.event.*;
+import java.awt.*;
+import javax.swing.*;
+import javax.sound.midi.*;
+import java.io.*;
+import java.net.*;
+import javax.swing.event.*;
+
+
+public class BeatBoxFinal {
+
+				JPanel mainPanel;
+				ArrayList<JCheckBox> checkboxList;                                    //храним флажки в масиве ArrayList
+				Sequencer sequencer;                                                  //воспроизведение муз последовательности
+				Sequence sequence;                                                     //музыкальная последовательность
+				Track track;
+				JFrame theFrame;
+				JList incomingList;
+				int nextNum;
+				Vector<String> listVector = new Vector<String>();
+				ObjectOutputStream out;
+				ObjectInputStream in;
+				HashMap<String, boolean[]> otherSeqsMap = new HashMap<String, boolean[]>();
+				Sequence mySequence = null;
+				String userName;
+				JTextField userMessage;
+				
+				
+	            //названияя инструментов в ввиде строкового массива ,предназначены для создания меток в пользовательском интерфейсе
+				String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat", "Open Hi-Hat","Acoustic Snare", "Crash Cymbal", "Hand Clap",
+						"Higt Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga", "Cowbell", "Vibraslap", "Low-mid Tom", "High Agogo", "Open Hi Conga"};
+				
+				//числа представляют собой борабанные клавиши
+				int[] instruments = {35,42,46,38,49,39,50,60,70,72,64,56,58,47,67,63};
+				
+				public static void main (String[] args){
+					                                    //добавляем класс BetBox в main
+					
+					BeatBoxFinal  BeatBox2 = new BeatBoxFinal ();                                      //добавляем класс BetBox в main
+					BeatBox2.startUp(args[0]);
+				}
+
+				public void startUp(String name){
+					
+					userName = name;
+					//открываем соединение с сервером
+					try {
+						
+						Socket sock = new Socket("127.0.0.1",4242);
+						out = new ObjectOutputStream(sock.getOutputStream());
+						in = new ObjectInputStream (sock.getInputStream());
+						Thread remote = new Thread (new RemoteReader());
+						remote.start();
+						
+					} catch(Exception ex) {
+						System.out.println("couldn't connect - you'll have to play alone.");
+					}
+					
+					setUpMidi();
+					buildGUI();
+					
+				}
+				
+				public void buildGUI(){
+					theFrame = new JFrame("Cyber BeatBoxFinal");                            //создаем фрейм и называем
+					theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);           //включение и выключение фрейма
+					BorderLayout layout = new BorderLayout();                          //создаем разметку для обектов
+					JPanel background = new JPanel(layout);                            //создаем панель для фрейма и добавляем в нее разметку
+					background.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));// setBorder -пустая граница позволяет создать поля между краями панели и местами размещения компонентов
+					
+					checkboxList = new ArrayList<JCheckBox>();
+					Box buttonBox = new Box(BoxLayout.Y_AXIS);                         //BoxLayout.Y_AXIS--компоненты размещаються вертикально сверху в низ для кнопок в коробке
+					
+					JButton start = new JButton ("Start");                             //создание кнопки "Start"
+					start.addActionListener(new MyStartListener());                    //подключаем слушатель для кнопки "Start"
+					buttonBox.add(start);                                              //размещаем кнопку вертикально
+					
+					JButton stop = new JButton ("Stop");
+					stop.addActionListener(new MyStopListener());
+					buttonBox.add(stop);
+					
+					JButton upTempo = new JButton ("Tempo Up");
+					upTempo.addActionListener(new MyUpTempoListener());
+					buttonBox.add(upTempo);
+					
+					JButton downTempo = new JButton ("Tempo Down");
+					downTempo.addActionListener(new MyDownTempoListener());
+					buttonBox.add(downTempo);
+					
+					JButton sendIt = new JButton ("sendIt");
+					sendIt.addActionListener(new MySendListener());
+					buttonBox.add(sendIt);
+					
+					userMessage = new JTextField();
+					buttonBox.add(userMessage);
+					
+					incomingList = new JList(); //JList -это компонент в котором отображаються входящие сообщения. Благодаря этому мы вправе загружать и воспроизводить прикрепляемые к ним музыкальные шаблоны.
+					incomingList.addListSelectionListener(new MyListSelectionListener());
+					incomingList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+					JScrollPane theList = new JScrollPane(incomingList);
+					buttonBox.add(theList);
+					incomingList.setListData(listVector);
+					
+				    Box nameBox = new Box(BoxLayout.Y_AXIS);                             //BoxLayout.Y_AXIS--компоненты размещаються вертикально сверху..для инструментов
+				    for (int i = 0;i < 16; i++){
+				    	nameBox.add(new Label (instrumentNames[i]));                     //размещение инструментов горинтально вниз в коробке
+				    }
+				    
+				    background.add(BorderLayout.EAST, buttonBox);                        //добавление коробки с кнопками в окно панели
+				    background.add(BorderLayout.WEST, nameBox);                          //добавление коробки с инструментами в окно панели
+					
+				    theFrame.getContentPane().add(background);                           //добавление панели во фрейм
+				    
+				    GridLayout grid = new GridLayout(16,16);                             //размещает елементы друг за другом в списке 16 верт 16 гор.
+				    grid.setVgap(1);                                                     //отступы между вертикальными елементами                                                   
+				    grid.setHgap(2);                                                     //отступы между горизонтальными елементами
+				    mainPanel = new JPanel(grid);                                        //создание новой панели 
+				    background.add(BorderLayout.CENTER, mainPanel);                      //добавление новой панели (mainPanel) в панель(background) в центр
+				    
+				    for (int i = 0; i < 256; i++){                 //создаем флажки ,присваиваем им значения fals(чтобы они не были установлены)а затем добавляем их в масив ArrayList и на панель
+				    	JCheckBox c = new JCheckBox();             //создаем флажки 
+				    	c.setSelected(false);                      //setSelected---присваиваем значение (false)чтобы они не были установлены
+				    	checkboxList.add(c);                       //добавляем флажки в масив ArrayList
+				    	mainPanel.add(c);                          //добаляем флажки на панель
+				    }
+				    
+					setUpMidi();                                   //запускаем функцию setUpMidi()
+					
+					theFrame.setBounds(50,50,300,300);             //задаем ширину и высоту фрейма
+					theFrame.pack();                               //метод указывает минимальный размер окна фрейма что-бы все вместилось
+					theFrame.setVisible(true);                     //метод делает прозрачность окна фрейма
+				}
+				
+				public void setUpMidi(){                           //пишем функцию для получения синтезатора
+					
+					try{
+						//обычный midi код для получения синтезатора, секвенсора и дорожки
+						sequencer = MidiSystem.getSequencer();     //получаем секвенсор по умолчанию
+						sequencer.open();                          //открывает устройство
+						sequence = new Sequence(Sequence.PPQ,4);   //построение дорожки исполнения(последовательность)
+						track = sequence.createTrack();            //создание нового пустого трека
+						sequencer.setTempoInBPM(120);              //установка темпа надорожку 120
+						
+					} catch (Exception e) {e.printStackTrace();}
+				}
+
+				//Преобразоввуем состояния флажков в midiсобытия и добавляем их на дорожку
+				public void buildTrackAndStart(){
+					
+					ArrayList<Integer>trackList = null;                   //создаем массив из 16 элементов, чтобы сохранить значение для каждого елемента на все 16 тактов
+					
+					sequence.deleteTrack(track);              //избавляемся от старой дорожки и создаем новую
+					track = sequence.createTrack();           //создаем новую дорожку
+					
+					for (int i = 0; i < 16; i++){             //делаем это для каждого из 16 рядов
+						
+						trackList = new ArrayList<Integer>();              //добавляем в треклист 16 елементов
+						                                                //добавляем каждый из инструментов в эту переменную... задаем клавишу которая представляет собой инструмент . массив содержит  midi-числа для каждого инструмента
+						
+						for (int j = 0; j < 16; j++){         //делаем это для каждого такта текущего ряда
+							
+							JCheckBox jc = (JCheckBox) checkboxList.get(j + (16*i));//возвращает элемент по заданой позиции в этом списке и помещает его во флажок
+							if (jc.isSelected()){ 
+								int key = instruments[i];
+								trackList.add(new Integer(key));       
+							} else {                         //--(ячейку которая представляет такт)если нет то инструмент не доолжен играть в этом такте, поэтому присвоим ему 0.
+								trackList.add(null);       //Этот слот в треке должен быть пустым   
+							}
+						}//закрываем вложеный цикл
+						
+						makeTracks(trackList);               //для этого инструмента и для всех 16 тактов создаем события и добавляем их на дорожку.
+				
+					}//Закрываем внешний цикл
+					
+					track.add(makeEvent(192,9,1,0,15));      //мы всегда должны быть уверенны что события в такте 16 существует(от 0 до 15) иначе betbox может не пройти все 16 тактов перед тем как заново начнет последовательность.
+					try {
+						
+						sequencer.setSequence(sequence);     //устанавливает текущую последовательность на воспроизведение
+						sequencer.setLoopCount(sequencer.LOOP_CONTINUOUSLY);// позволяет задать количество повторений цикла или как в этом случае, непрерывный цикл.
+						sequencer.start();                   //начало воспроизведения данных миди
+						sequencer.setTempoInBPM(120);
+					} catch (Exception e) {e.printStackTrace();}
+					 
+				}//закрываем метод
+				
+				public class MyStartListener implements ActionListener {  //первый из внутренних классов - слушатель для кнопки
+					public void actionPerformed(ActionEvent a){
+						buildTrackAndStart();
+					}
+				}
+				
+				public class MyStopListener implements ActionListener {
+					public void actionPerformed(ActionEvent a){
+						sequencer.stop();
+					}
+				}
+				
+				public class MyUpTempoListener implements ActionListener {
+					public void actionPerformed(ActionEvent a){
+						float tempoFactor = sequencer.getTempoFactor();
+					    sequencer.setTempoFactor((float)(tempoFactor * 1.03));//коефициент темпа определяет темп синтезатора.по умолчанию он равен 1.0 поэтому щелчком мыши можно изменить +\- 3%
+					}
+				}
+				
+				public class MyDownTempoListener implements ActionListener {
+					public void actionPerformed(ActionEvent a){
+						float tempoFactor = sequencer.getTempoFactor();
+					    sequencer.setTempoFactor((float)(tempoFactor * .97));
+					}
+				}
+				
+				public class MySendListener implements ActionListener {
+					
+					public void actionPerformed (ActionEvent a){
+						
+						//создаем массив в котором будут храниться только состояния флажков
+						boolean[] checkboxState = new boolean[256];
+						for (int i = 0; i < 256; i++){
+							
+							JCheckBox check = (JCheckBox) checkboxList.get(i);
+							if(check.isSelected()){//все похоже на SimpleChatClient но вместо отправки строкового сообщения мы сериализуем два обьекта(строковое сообщение и музыкальный шаблон) и записываем их в исходящий поток сокета (на сервер)
+								
+								checkboxState[i] = true;
+							}
+						}//закрываем цикл
+						String messageToSend = null;
+						try {
+							out.writeObject(userName + nextNum++ +":" + userMessage.getText());
+							out.writeObject(checkboxState);
+						}catch(Exception ex){
+							System.out.println("Sorry dude. Could not sent it to the server.");
+						}
+						userMessage.setText("");
+					}//закрываем actionperformed
+					
+				}//закрываем вложенный класс
+				
+				public class MyListSelectionListener implements ListSelectionListener{//
+					public void valueChanged(ListSelectionEvent le){
+						
+						if(!le.getValueIsAdjusting()){
+							
+							String selected = (String) incomingList.getSelectedValue();
+							if (selected != null) {
+								//Переходим к отображению и изменяем последовательность
+								boolean[] selectedState = (boolean[]) otherSeqsMap.get(selected);
+								changeSequence(selectedState);
+								sequencer.stop();
+								buildTrackAndStart();
+							}
+						}
+					}//закрываем alueChanged
+					
+					
+				}//Закрываем вложенный класс
+				
+				public class RemoteReader implements Runnable {
+					boolean[] checkboxState = null;
+					String nameToShow = null;
+					Object obj = null;
+					public void run() {
+						
+						try {
+							
+							while((obj=in.readObject()) != null){
+
+								System.out.println("got an object from server");
+								System.out.println(obj.getClass());
+								String nameToShow = (String) obj;
+								checkboxState = (boolean[]) in.readObject();
+								otherSeqsMap.put(nameToShow, checkboxState);
+								listVector.add(nameToShow);
+								incomingList.setListData(listVector);
+								
+								
+						}//закрываем  цикл while
+					}catch(Exception ex) {ex.printStackTrace();}
+				  }//закрываем run
+				}//закрываем вложенный класс
+				
+				public class MyPlayMineListener implements ActionListener {
+					
+					public void actionPerformed (ActionEvent a) {
+						if (mySequence != null){
+							sequence = mySequence;
+						}
+					}
+				}
+				
+				public void changeSequence(boolean[] checkboxState){
+					
+					for (int i = 0; i < 256; i++){
+						
+						JCheckBox check = (JCheckBox) checkboxList.get(i);
+						if (checkboxState[i]){
+							
+							check.setSelected(true);
+						}else {
+							check.setSelected(false);
+						}
+					}
+				}
+				
+				public void makeTracks(ArrayList list){ //метод создает события для одного инструмента за каждый проход цикла для всех 16 тактов.можно получить int[] для bass drumи и каждый елемент массива будет содержать либо клавишу этого елемента либо ноль.
+					   //если ноль то инсремент не должен играть на текущем такте.иначе нужно создать событие и добавить эго в дорожку.  
+					Iterator it = list.iterator();
+					for (int i = 0; i < 16; i++){
+						Integer num = (Integer) it.next();
+						
+						if (num !=  null){
+							int numKey = num.intValue();
+							track.add(makeEvent(144,9,numKey, 100, i));//создаем события выключая и включая и добавляем их в дорожку.
+							track.add(makeEvent(128,9,numKey, 100, i+1));
+						}
+					}
+				}
+				//создаем сообщение для помещения миди на дорожку
+				public MidiEvent makeEvent (int comd, int chan, int one, int two, int tick){
+					
+					MidiEvent event = null;
+					try{
+						ShortMessage a = new ShortMessage();
+						a.setMessage(comd, chan, one, two);
+						event = new MidiEvent(a, tick);
+					}catch (Exception e) {e.printStackTrace();}
+					return event;
+					
+				}
+				
+	}
+
+
+		
+	
+	
+

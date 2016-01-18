@@ -1,0 +1,53 @@
+.top_sec li.usr_btn{
+	margin-left: 18px;
+	font-family: Arial, serif;
+	line-height: 18px;
+	color:#fff;
+	margin-top: 4px;
+	float:left;
+	font-size:12px;
+	margin-left: 1px;
+	padding: 5px 18px;
+	border-radius: 1px;
+	font-weight: 700;
+	cursor: pointer;
+	background:#11BD9D;
+}
+.top_sec li.site_new {
+	background: .top_sec li.usr_btn{
+	margin-left: 18px;
+	font-family: Arial, serif;
+	line-height: 18px;
+	color:#fff;
+	margin-top: 4px;
+	float:left;
+	font-size:12px;
+	margin-left: 1px;
+	padding: 5px 18px;
+	border-radius: 1px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+
+.top_sec li.site_make:hover {
+	background: #fff;
+	color:#11BD9D;
+}
+
+;	
+}
+.top_sec li.site_new:hover, .top_sec li.site_make:hover {
+	color:#11BD9D;
+	background-color:#FFF;
+}
+
+.top_sec li.site_make {
+	background-color:#11BD9D;
+	margin-left: 0.5cm;
+}
+/*
+.top_sec li.site_make:hover {
+	background: white; color: black;
+}*/
+

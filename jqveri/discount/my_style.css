@@ -1,0 +1,91 @@
+div{
+height:245px;
+text-align:left;
+border: solid #FFFFFF 3px;
+}
+
+#header{
+width:100%;
+border: 0px;
+height:50px;
+}
+
+#main{
+background-color: grey;
+height:500px;
+padding:150 0 0 600;
+}
+
+.robot{
+float:left;
+margin:50 0 0 30;
+height:150px;
+width:150px;
+background-color: #000000;
+
+}
+
+img{
+margin:30 0 0 30;
+width:80px;
+height:80px;
+}
+
+p.nomer{
+margin-left:20px;
+color: #696969;
+}
+
+.robot22{
+height:40px;
+width:400px;
+background-color: #708090;
+margin-left:800px;
+}
+
+
+p.nomer2{
+margin-left:150px;
+color: #FFDAB9;
+}
+
+
+.discount{
+border: solid #FFFACD 3px;
+background-color: #FFFACD;
+}
+
+.no_discont{
+border: solid #F0FFF0 3px;
+background-color: #F0FFF0;
+}
+
+.discont22{
+border: solid #98FB98 3px;
+background-color: #98FB98;
+}
+
+.discont33{
+border: solid #FFDAB9 3px;
+background-color: #FFDAB9;
+}
+
+#nomer3{
+margin-left:30px;
+color: #CD5C5C;
+}
+
+p#nomer{
+margin-left:20px;
+color: #696969;
+}
+
+.discont44{
+border: solid #F8F8FF 3px;
+background-color: #F8F8FF;
+}
+
+h2{
+margin-left:800px;
+color: #708090;
+}

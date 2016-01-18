@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>YouCube - The Blog for Cube P uzzlers</title>
+
+<script type="text/javascript" src="ajax.js"></script>
+
+<script type="text/javascript">
+
+function getText(elem){
+var text = " ";
+ if(elem){
+   if(elem.childNodes){
+     for(var i = 0;i < elem.childNodes.length; i++){
+      var child = elem.childNodes[i];
+       if (child.nodeValue){
+        text += child.nodeValue;
+       }else{ 
+         if (child.childNodes)
+           if (child.childNodes[0].nodeValue)
+              text += child.childNodes[0].nodeValue;
+       }
+     }
+   }
+ }
+ return text;
+} 
+
+
+function Blog(body, date, img) {
+ 
+ this.body = body;
+ this.date = date;
+ this.img = img;
+}
+
+Blog.blogSorted = function(a, b){
+ return b.date - a.date;
+};
+
+
+function randomBlog(){
+ var gfh = Math.floor(Math.random() * blog.length);
+ alert(blog[gfh].body);
+}
+
+
+function searchBlog(){ 
+
+ var poisk = document.getElementById("searchtext").value;
+ for(var j = 0; j < blog.length;j++){
+ var hg = blog[j].body;
+ var kj = hg.toLowerCase().indexOf(poisk.toLowerCase());
+ var ге = hg.toLowerCase().indexOf(poisk.toLowerCase());
+ var count = 0;
+ while ( ге != -1) {
+  count++;
+  ге = hg.toLowerCase().indexOf(poisk.toLowerCase(),(ге + 1));
+ }
+ var ui = hg.charAt(kj); 
+ if(kj != -1){
+ alert("Номер статьи: " + (j+1) + "\nСтатья блога: " + hg + "\nБуква: " + ui +   "\nНомер буквы:" + kj + "\nКоличество букв: " + count);}
+ break;
+ }
+}
+
+
+function Blogaddtext(form){
+ var text = form["showall22"];
+ var text2 = form["showall33"];
+ blog[4] = new Blog(text.value, new Date("10/17/2008"),"rehhhhhhhhh.jpg" );
+ text2.value = "ok";
+ text2.focus();
+ text2.select();
+}
+
+
+var blog = [ new Blog("Javascript - очень гибкий язык. В отличие от Java, PHP, C++ и  многих других языков, где наследование можно делать одним способом", new Date ("09/11/2008"), "r6j6j6j6j6.jpg"),
+ new Blog("В этом примере был создан объект класса Animal, и ему добавлены свойства  name и canWalk. Получилось вот так:", new Date("01/17/2008"), "r6j6j6j6j6.jpg"),
+ new Blog("Вместо этого объекты наследуют от объектов без всяких классов. Наследование  на классах можно построить(эмулировать), опираясь на базовое наследование javascript."  , new Date("03/14/2008"), "rehhhhhhhhh.jpg"),
+ new Blog("Привет как дела 4" , new Date("05/15/2008"), "dfngsnsen.jpg")];
+
+
+function showBlog(numEntries) {
+
+ blog.sort(Blog.blogSorted);
+ if(!numEntries){
+ numEntries = blog.length;}
+ var i = 0;
+ var blogText = " ";
+ while (i < blog.length && i < numEntries) {
+ if(blog[i].img){
+ blogText+= "<p><table><tr><td style='vertical-align:top'><strong>" + (blog [i].date.getMonth() + 1) + "/" +  
+ blog[i].date.getDate() + "/" +
+ blog[i].date.getFullYear() + "</strong></td>" + "<td><img src='" + blog[i].img + "'/></td><td style='vertical-align:top' >" + blog[i].body + "</td></tr></table>" + "</p>";
+ i++;
+ }else{blogText+= "<p><strong>" + (blog[i].date.getMonth() + 1) + "/" +  
+ blog[i].date.getDate() + "/" +
+ blog[i].date.getFullYear() + "</strong><br/>" + " " + blog[i].body + "</p>"; }
+ }
+
+document.getElementById("blog").innerHTML = blogText;
+
+}
+
+</script>
+
+
+</head>
+
+<body onload="showBlog(2);">
+
+<p><input id="searchtext" name="searchtext" type="text" size="15"/>
+<input id="search" type="button" value="поиск" onclick="searchBlog();"/></p>
+
+
+ <img src="cube.png" alt="YouCube"/>
+
+ <form name="rwe" action=" " enctype="text/plain"> 
+ <p>Введите текст: <input type="text" id="body22" value=""/></p>
+ <p>Введите Дату: <input type="text" id="date22" value=""/></p>
+ <p>Введите адресс картинки: <input type="text" id="image22" value=""/></p>
+<p><input id="search345" type="button" value="Случайная запись" onclick="randomBlog();"/></p>
+<p><input id="search7777" type="button" value="Записать в блог" onclick="startAjax();"/></p>
+<form/>
+<div id="blog"></div>
+ <input type="button" id="showall" value="Что написано в блог" onclick="showBlog(blog.length);"/>
+<div id="blog2"></div>
+
+</body>
+</html>
